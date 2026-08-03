@@ -1,16 +1,23 @@
-# This is a sample Python script.
+"""
+DOCX Mailing Address Labels Generator
+------------------
+Description: Main execution script that defines input/output configurations
+             and calls the external labeling engine to process home owner data.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+Author: Joseph Adogeri
+Version: 1.0.0
+Since: 2026-08-03
+File: main.py
+License: MIT
+"""
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from labels_engine import generate_word_labels_engine
 
+if __name__ == "__main__":
+    # Specify your input file path and your output file path here
+    csv_file = "home_owners.csv"
+    output_file = "avery_5160_labels.docx"
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # Run the label engine
+    generate_word_labels_engine(csv_file, output_file)
