@@ -1,3 +1,17 @@
+"""
+PDF Splitter Module
+------------------
+Description: Contains the core function to read PDF pages, extract
+             Bill Numbers via regex, and split pages into distinct files.
+
+Author: Joseph Adogeri
+Version: 1.0.0
+Since: 2026-08-03
+File: labels_engine.py
+License: MIT
+"""
+
+
 import csv
 from docx import Document
 from docx.shared import Inches, Pt
