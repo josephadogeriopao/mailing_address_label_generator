@@ -11,13 +11,32 @@ File: main.py
 License: MIT
 """
 
+import os
+import sys
+
+from dotenv import load_dotenv
 
 from labels_engine import generate_word_labels_engine
 
-if __name__ == "__main__":
-    # Specify your input file path and your output file path here
-    csv_file = "home_owners.csv"
-    output_file = "avery_5160_labels.docx"
+# Load the variables from the local .env file
+load_dotenv()
 
-    # Run the label engine
-    generate_word_labels_engine(csv_file, output_file)
+csv_file = os.environ.get("SOURCE_CSV_FILE", r"PATH TO PDF FILE")
+docx_file = os.environ.get("OUTPUT_DOCX_FILE", r"PATH TO OUTPUT FOLDER/ DIRECTORY")
+
+
+def main() -> None:
+    # Defensive check: Ensure both environment variables exist before running
+    if not all([csv_file, docx_file]):
+        print("❌ Error: Missing configuration paths in your .env file or fallbacks!")
+        return
+
+    print("Starting Generating Mailing Address Labels Service...")
+    print(f"-> Source CSV: {csv_file}")
+    print(f"-> Destination DOCX: {docx_file}\n")
+
+    generate_word_labels_engine(csv_file, docx_file)
+
+if __name__ == "__main__":
+    main()
+    sys.exit(0)
