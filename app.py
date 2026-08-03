@@ -1,3 +1,18 @@
+"""
+DOCX Mailing Address Labels Generator — Graphical UI Application
+--------------------------------------------------------------
+Description: Implements a high-visibility, dark-mode desktop user interface
+             built on CustomTkinter. Coordinates asynchronous file selection,
+             input form tracking, and safely dispatches long-running formatting tasks
+             to an isolated background thread worker engine.
+
+Author: Joseph Adogeri
+Version: 1.0.0
+Since: 2026-08-03
+File: app.py
+License: MIT
+"""
+
 import os
 import threading
 import customtkinter as ctk

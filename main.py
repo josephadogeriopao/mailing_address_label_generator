@@ -1,5 +1,5 @@
 """
-DOCX Mailing Address Labels Generator
+DOCX Mailing Address Labels Generator - Main application runner
 ------------------
 Description: Main execution script that defines input/output configurations
              and calls the external labeling engine to process home owner data.
