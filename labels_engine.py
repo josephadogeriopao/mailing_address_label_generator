@@ -1,8 +1,9 @@
 """
-PDF Splitter Module
+DOCX Mailing Address Labels Generator
 ------------------
-Description: Contains the core function to read PDF pages, extract
-             Bill Numbers via regex, and split pages into distinct files.
+Description: Contains the core function to read CSV file, extract
+             Owner Name, Address 1, Address 2, City, State and Zip Code and
+             bulk create labels in generated .docx file.
 
 Author: Joseph Adogeri
 Version: 1.0.0
