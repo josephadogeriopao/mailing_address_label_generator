@@ -21,3 +21,6 @@ dist/
 # PyInstaller metadata tracking sheets
 *.manifest
 *.spec
+
+# App theme configuration
+app_config.json
