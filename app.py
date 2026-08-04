@@ -14,6 +14,7 @@ License: MIT
 """
 
 import os
+import json
 import threading
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
@@ -26,6 +27,9 @@ class AddressLabelGeneratorApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
+        # Configuration file path for persistent settings
+        self.config_file = "app_config.json"
+
         # Window Config
         self.title("Address Label Generator")
         self.geometry("540x520")
@@ -36,8 +40,9 @@ class AddressLabelGeneratorApp(ctk.CTk):
         if os.path.exists(icon_filename):
             self.iconbitmap(icon_filename)
 
-        # Basic Theme Mapping
-        ctk.set_appearance_mode("System")  # Uses OS setting by default
+        # Load Saved Appearance Settings or Default to System
+        saved_theme = self.load_saved_theme()
+        ctk.set_appearance_mode(saved_theme)
         ctk.set_default_color_theme("blue")
 
         # Variables to store paths
@@ -45,6 +50,9 @@ class AddressLabelGeneratorApp(ctk.CTk):
         self.output_dir = ""
 
         self.create_widgets()
+
+        # Set dropdown selector to match active initial configuration state
+        self.theme_switch.set(saved_theme)
 
     def create_widgets(self):
         # 1. Header Frame
@@ -66,7 +74,6 @@ class AddressLabelGeneratorApp(ctk.CTk):
             width=90
         )
         self.theme_switch.pack(side="right")
-        self.theme_switch.set("System")
 
         # Subtitle Template Flag
         self.subtitle = ctk.CTkLabel(
@@ -133,8 +140,25 @@ class AddressLabelGeneratorApp(ctk.CTk):
         )
         self.generate_btn.pack(fill="x", padx=30, pady=(5, 20))
 
-    def change_theme(self, choice):
+    def load_saved_theme(self) -> str:
+        """Reads configuration properties from a JSON file."""
+        if os.path.exists(self.config_file):
+            try:
+                with open(self.config_file, "r") as f:
+                    config = json.load(f)
+                    return config.get("appearance_mode", "System")
+            except Exception:
+                pass
+        return "System"
+
+    def change_theme(self, choice: str):
+        """Sets application mode and writes current value to persistent storage."""
         ctk.set_appearance_mode(choice)
+        try:
+            with open(self.config_file, "w") as f:
+                json.dump({"appearance_mode": choice}, f)
+        except Exception as e:
+            print(f"Failed to save settings: {e}")
 
     def browse_csv(self):
         file_path = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
@@ -155,7 +179,8 @@ class AddressLabelGeneratorApp(ctk.CTk):
             self.dest_entry.configure(state="readonly")
 
     def update_progress(self, val):
-        self.progress_bar.set(val)
+        # Safely wrap structural view updates across non-main engine pipelines
+        self.after(0, lambda: self.progress_bar.set(val))
 
     def start_generation_thread(self):
         if not self.csv_path:
@@ -180,7 +205,7 @@ class AddressLabelGeneratorApp(ctk.CTk):
         self.progress_bar.set(0)
 
         # Run background thread so UI stays active
-        t = threading.Thread(target=self.run_generation, args=(final_out_path,))
+        t = threading.Thread(target=self.run_generation, args=(final_out_path,), daemon=True)
         t.start()
 
     def run_generation(self, out_path):
@@ -190,13 +215,20 @@ class AddressLabelGeneratorApp(ctk.CTk):
                 out_path,
                 progress_callback=self.update_progress
             )
-            self.status_label.configure(text="Document compiled successfully!", text_color="green")
-            messagebox.showinfo("Success", f"File created successfully!\n\nSaved to: {out_path}")
+            # Use main thread scheduling to prevent race conditions during popups
+            self.after(0, lambda: self.on_generation_success(out_path))
         except Exception as e:
-            self.status_label.configure(text="Error occurred during build", text_color="red")
-            messagebox.showerror("Execution Error", f"Failed to generate layout file safely:\n{str(e)}")
-        finally:
-            self.generate_btn.configure(state="normal")
+            self.after(0, lambda: self.on_generation_failure(str(e)))
+
+    def on_generation_success(self, out_path):
+        self.status_label.configure(text="Document compiled successfully!", text_color="green")
+        self.generate_btn.configure(state="normal")
+        messagebox.showinfo("Success", f"File created successfully!\n\nSaved to: {out_path}")
+
+    def on_generation_failure(self, error_msg):
+        self.status_label.configure(text="Error occurred during build", text_color="red")
+        self.generate_btn.configure(state="normal")
+        messagebox.showerror("Execution Error", f"Failed to generate layout file safely:\n{error_msg}")
 
 
 if __name__ == "__main__":
