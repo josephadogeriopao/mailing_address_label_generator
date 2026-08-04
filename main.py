@@ -31,9 +31,11 @@ def main() -> None:
         print("❌ Error: Missing configuration paths in your .env file or fallbacks!")
         return
 
-    print("Starting Generating Mailing Address Labels Service...")
+    print("\nStarting Generating Mailing Address Labels Service...")
     print(f"-> Source CSV: {csv_file}")
     print(f"-> Destination DOCX: {docx_file}\n")
+    print("Finished Generating Mailing Address Labels Service...")
+
 
     generate_word_labels_engine(csv_file, docx_file)
 

@@ -6,7 +6,7 @@ Description: Contains the core function to read CSV file, extract
              bulk create labels in generated .docx file.
 
 Author: Joseph Adogeri
-Version: 1.0.0
+Version: 1.0.4
 Since: 2026-08-03
 File: labels_engine.py
 License: MIT
@@ -60,15 +60,10 @@ def generate_word_labels_engine(csv_filename, docx_filename, progress_callback=N
     total_labels = len(labels_data)
     labels_per_sheet = 30
 
+    if total_labels == 0:
+        return
+
     doc = Document()
-
-    placeholder_p = doc.add_paragraph()
-    placeholder_p.paragraph_format.space_before = Pt(0)
-    placeholder_p.paragraph_format.space_after = Pt(0)
-    placeholder_p.paragraph_format.line_spacing = Pt(1)
-    run = placeholder_p.add_run()
-    run.font.size = Pt(1)
-
     apply_page_margins(doc.sections)
 
     num_sheets = (total_labels + labels_per_sheet - 1) // labels_per_sheet
@@ -104,7 +99,10 @@ def generate_word_labels_engine(csv_filename, docx_filename, progress_callback=N
             for c_idx in (0, 2, 4):
                 cell = row.cells[c_idx]
                 cell.width = Inches(2.63)
-                set_cell_margins(cell, top=60, bottom=0, left=140, right=140)
+                if c_idx == 0:
+                    set_cell_margins(cell, top=60, bottom=0, left=280, right=140)
+                else:
+                    set_cell_margins(cell, top=60, bottom=0, left=140, right=140)
 
             for c_idx in gap_columns:
                 cell = row.cells[c_idx]
@@ -131,5 +129,18 @@ def generate_word_labels_engine(csv_filename, docx_filename, progress_callback=N
                 addr_run = p.add_run(line)
                 addr_run.font.name = 'Aptos'
                 addr_run.font.size = Pt(9)
+
+    # Fix: Safely intercept the absolute trailing layout paragraph mark.
+    # We strip its margins and shrink its structural font size down to 1pt.
+    # This tricks Word into fitting the trailing empty line onto the sheet boundary.
+    if doc.paragraphs:
+        final_p = doc.paragraphs[-1]
+        final_p.paragraph_format.space_before = Pt(0)
+        final_p.paragraph_format.space_after = Pt(0)
+        final_p.paragraph_format.line_spacing = Pt(1)
+
+        # Inject an ultra-small text run context to lock the line size down
+        micro_run = final_p.add_run()
+        micro_run.font.size = Pt(1)
 
     doc.save(docx_filename)
