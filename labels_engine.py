@@ -119,14 +119,23 @@ def generate_word_labels_engine(csv_filename, docx_filename, progress_callback=N
             p.paragraph_format.line_spacing = 1.05
             p.paragraph_format.space_after = Pt(0)
 
+            # ADDITION START: Set structural indents so text starts in place but wrapped text stays aligned
+            p.paragraph_format.left_indent = Inches(0.35)
+            p.paragraph_format.first_line_indent = Inches(0.0)
+            # ADDITION END
+
+            # ADDITION START: Stripped the manual string spaces out so text runs are clean data
             name_run = p.add_run(lines[0])
+            # ADDITION END
             name_run.font.name = 'Aptos'
             name_run.font.size = Pt(10)
             name_run.bold = True
 
             for line in lines[1:]:
                 p.add_run("\n")
+                # ADDITION START: Stripped the manual string spaces here as well
                 addr_run = p.add_run(line)
+                # ADDITION END
                 addr_run.font.name = 'Aptos'
                 addr_run.font.size = Pt(9)
 
