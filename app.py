@@ -273,7 +273,9 @@ class AddressLabelGeneratorApp(ctk.CTk):
             self.after(0, lambda: self.on_generation_success(final_out_path))
         except Exception as e:
             # Pass formatting error messages directly into the UI state wrapper method
-            self.after(0, lambda: self.on_generation_failure(str(e)))
+            # NEW FIXED CODE FOR APP.PY
+            error_message = str(e)  # Tethers the text safely to a local variable
+            self.after(0, lambda msg=error_message: self.on_generation_failure(msg))
 
 
 if __name__ == "__main__":

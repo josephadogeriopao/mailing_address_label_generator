@@ -6,8 +6,8 @@ Description: Contains the core function to read CSV file, extract
              bulk create labels in generated .docx file.
 
 Author: Joseph Adogeri
-Version: 1.0.4
-Since: 2026-08-03
+Version: 1.1.5
+Since: 2026-09-16
 File: labels_engine.py
 License: MIT
 """
@@ -115,40 +115,41 @@ def generate_word_labels_engine(csv_filename, docx_filename, progress_callback=N
             col_idx = col_mapping[label_col]
 
             cell = table.cell(row_idx, col_idx)
+
             p = cell.paragraphs[0]
             p.paragraph_format.line_spacing = 1.05
             p.paragraph_format.space_after = Pt(0)
 
-            # ADDITION START: Set structural indents so text starts in place but wrapped text stays aligned
-            p.paragraph_format.left_indent = Inches(0.35)
+            p.paragraph_format.left_indent = Inches(0.15)
             p.paragraph_format.first_line_indent = Inches(0.0)
-            # ADDITION END
 
-            # ADDITION START: Stripped the manual string spaces out so text runs are clean data
+            # Owner Name remains 10pt bold and will wrap naturally if needed
             name_run = p.add_run(lines[0])
-            # ADDITION END
             name_run.font.name = 'Aptos'
             name_run.font.size = Pt(10)
             name_run.bold = True
 
-            for line in lines[1:]:
-                p.add_run("\n")
-                # ADDITION START: Stripped the manual string spaces here as well
-                addr_run = p.add_run(line)
-                # ADDITION END
-                addr_run.font.name = 'Aptos'
-                addr_run.font.size = Pt(9)
+            # Isolate address string fields
+            address_lines = lines[1:]
 
-    # Fix: Safely intercept the absolute trailing layout paragraph mark.
-    # We strip its margins and shrink its structural font size down to 1pt.
-    # This tricks Word into fitting the trailing empty line onto the sheet boundary.
+            # FIX: Only resize if an address line is GREATER than 27 characters
+            has_long_address = any(len(line) > 27 for line in address_lines)
+
+            # If greater than 27, drop to 6.5pt. If 27 or under, keep at 9pt.
+            address_font_size = Pt(6.5) if has_long_address else Pt(9)
+
+            for line in address_lines:
+                p.add_run("\n")
+                addr_run = p.add_run(line)
+                addr_run.font.name = 'Aptos'
+                addr_run.font.size = address_font_size
+
     if doc.paragraphs:
         final_p = doc.paragraphs[-1]
         final_p.paragraph_format.space_before = Pt(0)
         final_p.paragraph_format.space_after = Pt(0)
         final_p.paragraph_format.line_spacing = Pt(1)
 
-        # Inject an ultra-small text run context to lock the line size down
         micro_run = final_p.add_run()
         micro_run.font.size = Pt(1)
 
