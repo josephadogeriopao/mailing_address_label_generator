@@ -27,7 +27,11 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
+          # Forcefully remove conflicting namespace packages before installing
+          pip uninstall -y docx python-docx
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          # Force a clean, uncached installation of the modern package
+          pip install --no-cache-dir --force-reinstall python-docx
 
       # Step 4: Execute Python's built-in unit test module against your src folder layout
       - name: Run Tests via Unittest
