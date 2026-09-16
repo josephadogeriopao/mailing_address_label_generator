@@ -17,7 +17,7 @@ pip install -r requirements.txt
 pip freeze > requirements.txt
 
 # --- PACKAGING AND DISTRIBUTING APP ---
-python -m PyInstaller --noconsole --onefile --name "address_label_generator" --icon "app_icon.ico" --collect-all customtkinter app.py
+python -m PyInstaller --clean --noconsole --onefile --name "address_label_generator" --icon "app_icon.ico" --add-data "app_icon.ico;." --collect-all customtkinter src/app.py
 
 # -- THE SYSTEM CLEAN CACHED ASSETS LIKE REPLACED IMAGES ETC. --
 # Delete Your Local PyInstaller Cache
@@ -25,4 +25,4 @@ python -m PyInstaller --noconsole --onefile --name "address_label_generator" --i
 python -m PyInstaller --clean --noconsole --onefile --name "address_label_generator" --icon "app_icon.ico" --add-data "app_icon.ico;." --collect-all customtkinter app.py
 
 # --- RUNNING TEST SUITES ---
-python -m unittest test_labels_engine.py
+python -m unittest discover -s src -p "test_labels_engine.py"

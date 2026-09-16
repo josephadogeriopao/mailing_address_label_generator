@@ -16,7 +16,7 @@ import sys
 
 from dotenv import load_dotenv
 
-from labels_engine import generate_word_labels_engine
+from src.labels_engine import generate_word_labels_engine
 
 # Load the variables from the local .env file
 load_dotenv()

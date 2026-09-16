@@ -15,9 +15,9 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox
 
 # Import specialized architectural modules
-from config_manager import ConfigManager
-from ui import AddressLabelGeneratorUI
-from labels_engine import generate_word_labels_engine
+from src.config_manager import ConfigManager
+from src.ui import AddressLabelGeneratorUI
+from src.labels_engine import generate_word_labels_engine
 
 
 class AddressLabelGeneratorController:

@@ -3,7 +3,7 @@ from unittest.mock import patch, mock_open, MagicMock
 import io
 
 # Assuming your script is saved as labels_engine.py
-from labels_engine import (
+from src.labels_engine import (
     set_cell_margins,
     apply_page_margins,
     generate_word_labels_engine
