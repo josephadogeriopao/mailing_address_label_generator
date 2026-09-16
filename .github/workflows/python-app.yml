@@ -29,7 +29,9 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # Step 4: Execute Python's built-in unit test module against your test file
+      # Step 4: Execute Python's built-in unit test module against your src folder layout
       - name: Run Tests via Unittest
+        env:
+          PYTHONPATH: .
         run: |
-          python -m unittest discover -s . -p "test_*.py"
+          python -m unittest discover -s src -p "test_*.py"
